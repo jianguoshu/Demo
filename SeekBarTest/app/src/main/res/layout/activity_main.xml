@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="sharesdk.zhihui.com.seekbartest.MainActivity">
+
+    <SeekBar
+        android:id="@+id/seekbar"
+        android:foregroundGravity="center_vertical"
+        android:layout_width="match_parent"
+        android:paddingBottom="18dp"
+        android:layout_height="50dp"/>
+
+    <RatingBar
+        android:id="@+id/ratingbar"
+        android:paddingTop="30dp"
+        android:numStars="5"
+        android:stepSize="1.0"
+        android:rating="1.0"
+        android:isIndicator="false"
+        android:layout_below="@+id/seekbar"
+        android:layout_width="wrap_content"
+        android:layout_height="100dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_centerInParent="true">
+
+        <Button
+            android:id="@+id/btn_jia"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:text="jia"/>
+
+        <Button
+            android:id="@+id/btn_jian"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:text="jian"/>
+    </LinearLayout>
+</RelativeLayout>

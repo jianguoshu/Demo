@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+
+        android:color="#FF009900">
+
+    <item
+        android:drawable="@drawable/shape_btn_bg_default_pressed"/>
+    <selector>
+
+        <item
+            android:color="#666666"
+            android:state_pressed="true"/>
+        <item
+            android:color="#666666"
+            android:state_selected="true"/>
+        <item android:color="#ffffff"/>
+
+    </selector>
+</ripple>
