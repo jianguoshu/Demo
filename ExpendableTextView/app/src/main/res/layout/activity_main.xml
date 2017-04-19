@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.example.douzi.expendabletextview.MainActivity">
+
+    <com.example.douzi.expendabletextview.ExpendableTextView
+        android:id="@+id/tv_1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#009900"
+        android:ellipsize="end"
+        android:includeFontPadding="false"
+        android:text="gagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagaga"
+        android:textSize="16dp" />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_gravity="bottom">
+
+        <TextView
+            android:id="@+id/tv_btn_line_one"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/selector_bg"
+            android:gravity="center"
+            android:text="一行" />
+
+        <TextView
+            android:id="@+id/tv_btn_line_more"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/selector_bg"
+            android:gravity="center"
+            android:text="多行" />
+
+        <TextView
+            android:id="@+id/tv_btn_expend"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/selector_bg"
+            android:gravity="center"
+            android:text="展开" />
+
+        <TextView
+            android:id="@+id/tv_btn_shouqi"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/selector_bg"
+            android:gravity="center"
+            android:text="收起" />
+    </LinearLayout>
+</FrameLayout>
