@@ -13,9 +13,20 @@
         android:layout_height="wrap_content"
         android:background="#009900"
         android:ellipsize="end"
+        android:maxLines="3"
         android:includeFontPadding="false"
         android:text="gagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagaga"
         android:textSize="16dp" />
+
+
+    <FrameLayout
+        android:id="@+id/fl_text_container"
+        android:layout_width="match_parent"
+        android:layout_gravity="center"
+        android:background="#000099"
+        android:layout_height="wrap_content">
+
+    </FrameLayout>
 
 
     <LinearLayout
