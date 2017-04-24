@@ -1,12 +1,16 @@
 package com.example.douzi.expendabletextview;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.support.annotation.Nullable;
 import android.text.Layout;
+import android.text.SpannableStringBuilder;
 import android.text.StaticLayout;
 import android.text.TextUtils;
+import android.text.style.ForegroundColorSpan;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -19,7 +23,8 @@ public class CollapsibleTextView extends TextView implements View.OnLayoutChange
     private int width;
     private String mText;
 
-    private String ellipsisText = "...全文";
+    private String expendText = "...全文";
+    private String collapseText = "收起";
 
     public CollapsibleTextView(Context context) {
         super(context);
@@ -64,28 +69,47 @@ public class CollapsibleTextView extends TextView implements View.OnLayoutChange
             StaticLayout staticLayout = new StaticLayout(text, 0, text.length(), getPaint(), width,
                     Layout.Alignment.ALIGN_NORMAL, 0, 0, false, TextUtils.TruncateAt.END, 0);
             totalLines = staticLayout.getLineCount();
-            if (isCollapsed && collapsible()) {
-                StringBuilder result = new StringBuilder();
+            if (collapsible()) {
+                SpannableStringBuilder result = new SpannableStringBuilder();
                 int start;
                 int end;
                 String strLine;
-                for (int line = 0; line < maxLines; line++) {
-                    start = staticLayout.getLineStart(line);
-                    end = staticLayout.getLineVisibleEnd(line);
-                    strLine = text.subSequence(start, end).toString();
-                    if (line < maxLines - 1) { // 每一行结尾加换行符防止行错乱
-                        result.append(strLine).append("\n");
-                    } else { // 最后一行
-                        Paint paint = getPaint();
-                        float widthExtra = paint.measureText(ellipsisText);
-                        int indexCharLast = strLine.length() - 1;
-                        while (widthExtra > 0 && indexCharLast >= 0) {
-                            float widthCharLast = paint.measureText(String.valueOf(strLine.charAt(indexCharLast)));
-                            widthExtra -= widthCharLast;
-                            indexCharLast--;
+                Paint paint = getPaint();
+                if (isCollapsed) {
+                    for (int line = 0; line < maxLines; line++) {
+                        start = staticLayout.getLineStart(line);
+                        end = staticLayout.getLineVisibleEnd(line);
+                        strLine = text.subSequence(start, end).toString();
+                        if (line < maxLines - 1) { // 每一行结尾加换行符防止行错乱
+                            result.append(strLine).append("\n");
+                        } else { // 最后一行
+                            float widthExtra = paint.measureText(expendText);
+                            int indexCharLast = strLine.length() - 1;
+                            while (widthExtra > 0 && indexCharLast >= 0) {
+                                float widthCharLast = paint.measureText(String.valueOf(strLine.charAt(indexCharLast)));
+                                widthExtra -= widthCharLast;
+                                indexCharLast--;
+                            }
+                            result.append(strLine.substring(0, indexCharLast + 1));
+                            result.append(expendText);
                         }
-                        result.append(strLine.substring(0, indexCharLast + 1));
-                        result.append(ellipsisText);
+                    }
+                } else {
+                    for (int line = 0; line < totalLines; line++) {
+                        start = staticLayout.getLineStart(line);
+                        end = staticLayout.getLineVisibleEnd(line);
+                        strLine = text.subSequence(start, end).toString();
+                        if (line < totalLines - 1) { // 每一行结尾加换行符防止行错乱
+                            result.append(strLine).append("\n");
+                        } else { // 最后一行
+                            result.append(strLine);
+                            float desiredWidth = staticLayout.getDesiredWidth(strLine, getPaint());
+                            float widthExtra = paint.measureText(collapseText);
+                            if (widthExtra + desiredWidth > width) {
+                                result.append("\n");
+                            }
+                            result.append(collapseText);
+                        }
                     }
                 }
                 resultText = result.toString();
