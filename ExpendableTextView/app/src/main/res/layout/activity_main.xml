@@ -7,15 +7,15 @@
     android:orientation="vertical"
     tools:context="com.example.douzi.expendabletextview.MainActivity">
 
-    <com.example.douzi.expendabletextview.ExpendableTextView
+    <com.example.douzi.expendabletextview.CollapsibleTextView
         android:id="@+id/tv_1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#009900"
+        android:maxLines="6"
         android:ellipsize="end"
-        android:maxLines="3"
         android:includeFontPadding="false"
-        android:text="gagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagaga"
+        android:text="我来试一下下嘎嘎噶我来试一下下嘎嘎噶我来试一下下嘎嘎噶我来试一下下嘎嘎噶我来试一下下嘎嘎噶我来试一下下嘎嘎噶我来试一下下嘎嘎噶我来试一下下嘎嘎噶我来试一下下嘎嘎噶我来试一下下嘎嘎噶我来试一下下嘎嘎噶我来试一下下嘎嘎噶我来试一下下嘎嘎噶我来试一下下嘎嘎噶我来试一下下嘎嘎噶我来试一下下嘎嘎噶我来试一下下嘎嘎噶我来试一下下嘎嘎噶我来试一下下嘎嘎噶我来试一下下嘎嘎噶我来试一下下嘎嘎噶我来试一下下嘎嘎噶"
         android:textSize="16dp" />
 
 

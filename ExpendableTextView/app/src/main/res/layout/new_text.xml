@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <com.example.douzi.expendabletextview.ExpendableTextView
+    <com.example.douzi.expendabletextview.CollapsibleTextView
         android:id="@+id/new_textview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
