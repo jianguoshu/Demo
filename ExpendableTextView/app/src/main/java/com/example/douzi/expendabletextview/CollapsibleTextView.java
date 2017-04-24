@@ -6,6 +6,7 @@ import android.graphics.Paint;
 import android.support.annotation.Nullable;
 import android.text.Layout;
 import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.StaticLayout;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
@@ -21,7 +22,7 @@ public class CollapsibleTextView extends TextView implements View.OnLayoutChange
     int totalLines = LINES_INVALID; // 总行数，每次设置text时计算更新此变量
     boolean isCollapsed; // 记录展开收起状态
     private int width;
-    private String mText;
+    private CharSequence mText;
 
     private String expendText = "...全文";
     private String collapseText = "收起";
@@ -58,19 +59,18 @@ public class CollapsibleTextView extends TextView implements View.OnLayoutChange
 
     @Override
     public void setText(CharSequence text, BufferType type) {
-        String textNew = processText(text);
+        SpannableStringBuilder textNew = processText(text);
         super.setText(textNew, type);
     }
 
-    private String processText(CharSequence text) {
-        mText = text.toString();
-        String resultText = mText;
+    private SpannableStringBuilder processText(CharSequence text) {
+        mText = text;
+        SpannableStringBuilder resultBuilder = new SpannableStringBuilder();
         if (width > 0 && mText != null) {
             StaticLayout staticLayout = new StaticLayout(text, 0, text.length(), getPaint(), width,
                     Layout.Alignment.ALIGN_NORMAL, 0, 0, false, TextUtils.TruncateAt.END, 0);
             totalLines = staticLayout.getLineCount();
             if (collapsible()) {
-                SpannableStringBuilder result = new SpannableStringBuilder();
                 int start;
                 int end;
                 String strLine;
@@ -81,7 +81,7 @@ public class CollapsibleTextView extends TextView implements View.OnLayoutChange
                         end = staticLayout.getLineVisibleEnd(line);
                         strLine = text.subSequence(start, end).toString();
                         if (line < maxLines - 1) { // 每一行结尾加换行符防止行错乱
-                            result.append(strLine).append("\n");
+                            resultBuilder.append(strLine).append("\n");
                         } else { // 最后一行
                             float widthExtra = paint.measureText(expendText);
                             int indexCharLast = strLine.length() - 1;
@@ -90,8 +90,10 @@ public class CollapsibleTextView extends TextView implements View.OnLayoutChange
                                 widthExtra -= widthCharLast;
                                 indexCharLast--;
                             }
-                            result.append(strLine.substring(0, indexCharLast + 1));
-                            result.append(expendText);
+                            resultBuilder.append(strLine.substring(0, indexCharLast + 1));
+                            resultBuilder.append(expendText);
+                            ForegroundColorSpan span = new ForegroundColorSpan(Color.RED);
+                            resultBuilder.setSpan(span, resultBuilder.length() - 2, resultBuilder.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
                         }
                     }
                 } else {
@@ -100,22 +102,31 @@ public class CollapsibleTextView extends TextView implements View.OnLayoutChange
                         end = staticLayout.getLineVisibleEnd(line);
                         strLine = text.subSequence(start, end).toString();
                         if (line < totalLines - 1) { // 每一行结尾加换行符防止行错乱
-                            result.append(strLine).append("\n");
+                            resultBuilder.append(strLine).append("\n");
                         } else { // 最后一行
-                            result.append(strLine);
+                            resultBuilder.append(strLine);
                             float desiredWidth = staticLayout.getDesiredWidth(strLine, getPaint());
                             float widthExtra = paint.measureText(collapseText);
                             if (widthExtra + desiredWidth > width) {
-                                result.append("\n");
+                                resultBuilder.append("\n");
                             }
-                            result.append(collapseText);
+                            resultBuilder.append(collapseText);
+                            ForegroundColorSpan span = new ForegroundColorSpan(Color.RED);
+                            resultBuilder.setSpan(span, resultBuilder.length() - 2, resultBuilder.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
                         }
                     }
                 }
-                resultText = result.toString();
+            } else {
+                if (text != null) {
+                    resultBuilder.append(text);
+                }
+            }
+        } else {
+            if (text != null) {
+                resultBuilder.append(text);
             }
         }
-        return resultText;
+        return resultBuilder;
     }
 
     public boolean collapsible() {
