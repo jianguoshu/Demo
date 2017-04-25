@@ -112,7 +112,7 @@ public class CollapsibleTextView extends TextView implements View.OnLayoutChange
                             float widthExtra = paint.measureText(expendText + ellipsisSymbol);
                             int indexCharLast = strLine.length() - 1;
                             while (widthExtra > 0 && indexCharLast >= 0) {
-                                float widthCharLast = paint.measureText(String.valueOf(strLine.charAt(indexCharLast)));
+                                float widthCharLast = paint.measureText(strLine.substring(indexCharLast, indexCharLast + 1));
                                 widthExtra -= widthCharLast;
                                 indexCharLast--;
                             }
