@@ -20,6 +20,7 @@ import android.widget.TextView;
 public class CollapsibleTextView extends TextView implements View.OnLayoutChangeListener {
 
     public static final int LINES_INVALID = -1;
+    public static final int COLOR_INVALID = -1;
     int maxLines = LINES_INVALID; // 保存最大行数
     int totalLines = LINES_INVALID; // 总行数，每次设置text时计算更新此变量
     boolean isCollapsed; // 记录展开收起状态
@@ -30,7 +31,8 @@ public class CollapsibleTextView extends TextView implements View.OnLayoutChange
     private String ellipsisSymbol = "...";
     private String collapseText = "收起";
     private boolean collapsibleByHand = false; // 是否显示收起功能
-    private int collapseSwitcherColor = Color.RED; // 展开、收起文字的颜色
+    private int collapseSwitcherColor = COLOR_INVALID; // 展开、收起文字的颜色
+    private int collapseSwitcherColorId = COLOR_INVALID; // 展开、收起文字的颜色
 
     public CollapsibleTextView(Context context) {
         super(context);
@@ -50,7 +52,26 @@ public class CollapsibleTextView extends TextView implements View.OnLayoutChange
     private void init(@Nullable AttributeSet attrs) {
         maxLines = LINES_INVALID;
         if (attrs != null) {
+            String nameSpace = "http://schemas.android.com/apk/res-auto";
             maxLines = attrs.getAttributeIntValue("http://schemas.android.com/apk/res/android", "maxLines", LINES_INVALID);
+            String expendText = attrs.getAttributeValue(nameSpace, "expend_text");
+            String collapseText = attrs.getAttributeValue(nameSpace, "collapse_text");
+            String ellipsisSymbol = attrs.getAttributeValue(nameSpace, "ellipsis_symbol");
+            if (!TextUtils.isEmpty(expendText)) {
+                this.expendText = expendText;
+            }
+            if (!TextUtils.isEmpty(collapseText)) {
+                this.collapseText = collapseText;
+            }
+            if (!TextUtils.isEmpty(ellipsisSymbol)) {
+                this.ellipsisSymbol = ellipsisSymbol;
+            }
+
+            collapsibleByHand = attrs.getAttributeBooleanValue(nameSpace, "collapsible_by_hand", false);
+            collapseSwitcherColor = attrs.getAttributeIntValue(nameSpace, "collapse_switcher_color", COLOR_INVALID);
+            if (collapseSwitcherColor == COLOR_INVALID) {
+                collapseSwitcherColorId = attrs.getAttributeResourceValue(nameSpace, "collapse_switcher_color_id", COLOR_INVALID);
+            }
         }
         isCollapsed = maxLines != LINES_INVALID;
     }
@@ -144,7 +165,11 @@ public class CollapsibleTextView extends TextView implements View.OnLayoutChange
             @Override
             public void updateDrawState(TextPaint ds) {
                 super.updateDrawState(ds);
-                ds.setColor(collapseSwitcherColor);
+                if (collapseSwitcherColor != COLOR_INVALID) {
+                    ds.setColor(collapseSwitcherColor);
+                } else if (collapseSwitcherColorId != COLOR_INVALID) {
+                    ds.setColor(getResources().getColor(collapseSwitcherColorId));
+                }
                 ds.setUnderlineText(false);
             }
         };
