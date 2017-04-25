@@ -225,4 +225,34 @@ public class CollapsibleTextView extends TextView implements View.OnLayoutChange
             collapseForce(isCollapsed);
         }
     }
+
+    public void setExpendText(String expendText) {
+        if (!TextUtils.isEmpty(expendText)) {
+            this.expendText = expendText;
+        }
+    }
+
+    public void setEllipsisSymbol(String ellipsisSymbol) {
+        if (!TextUtils.isEmpty(expendText)) {
+            this.ellipsisSymbol = ellipsisSymbol;
+        }
+    }
+
+    public void setCollapseText(String collapseText) {
+        if (!TextUtils.isEmpty(expendText)) {
+            this.collapseText = collapseText;
+        }
+    }
+
+    public void setCollapsibleByHand(boolean collapsibleByHand) {
+        this.collapsibleByHand = collapsibleByHand;
+    }
+
+    public void setCollapseSwitcherColor(int collapseSwitcherColor) {
+        this.collapseSwitcherColor = collapseSwitcherColor;
+    }
+
+    public void setCollapseSwitcherColorId(int collapseSwitcherColorId) {
+        this.collapseSwitcherColorId = collapseSwitcherColorId;
+    }
 }
