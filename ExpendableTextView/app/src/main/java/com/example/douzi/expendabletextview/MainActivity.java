@@ -1,8 +1,13 @@
 package com.example.douzi.expendabletextview;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -30,8 +35,12 @@ public class MainActivity extends Activity {
         textView2.setEllipsize(TextUtils.TruncateAt.END);
         String text = "我来试一下test我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下";
         text = "gagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagaggagagagaga";
-        textView2.setText(text);
+        SpannableString builder = new SpannableString(text);
+        ForegroundColorSpan span = new ForegroundColorSpan(Color.RED);
+        builder.setSpan(span, 0, 10, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+        textView2.setText(builder);
         textView2.collapse(true);
+        textView2.setCollapsibleByHand(true);
 
         FrameLayout textContainer = (FrameLayout) this.findViewById(R.id.fl_text_container);
         textContainer.addView(contentView);

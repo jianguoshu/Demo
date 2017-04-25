@@ -99,24 +99,24 @@ public class CollapsibleTextView extends TextView implements View.OnLayoutChange
             if (collapsible()) {
                 int start;
                 int end;
-                String strLine;
+                CharSequence strLine;
                 Paint paint = getPaint();
                 if (isCollapsed) {
                     for (int line = 0; line < maxLines; line++) {
                         start = staticLayout.getLineStart(line);
                         end = staticLayout.getLineVisibleEnd(line);
-                        strLine = text.subSequence(start, end).toString();
+                        strLine = text.subSequence(start, end);
                         if (line < maxLines - 1) { // 每一行结尾加换行符防止行错乱
                             resultBuilder.append(strLine).append("\n");
                         } else { // 最后一行
                             float widthExtra = paint.measureText(expendText + ellipsisSymbol);
                             int indexCharLast = strLine.length() - 1;
                             while (widthExtra > 0 && indexCharLast >= 0) {
-                                float widthCharLast = paint.measureText(strLine.substring(indexCharLast, indexCharLast + 1));
+                                float widthCharLast = paint.measureText(String.valueOf(strLine.subSequence(indexCharLast, indexCharLast + 1)));
                                 widthExtra -= widthCharLast;
                                 indexCharLast--;
                             }
-                            resultBuilder.append(strLine.substring(0, indexCharLast + 1));
+                            resultBuilder.append(strLine.subSequence(0, indexCharLast + 1));
                             resultBuilder.append(ellipsisSymbol).append(expendText);
                             ClickableSpan clickableSpan = getClickableSpan();
                             resultBuilder.setSpan(clickableSpan, resultBuilder.length() - expendText.length(), resultBuilder.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
@@ -128,7 +128,7 @@ public class CollapsibleTextView extends TextView implements View.OnLayoutChange
                     for (int line = 0; line < totalLines; line++) {
                         start = staticLayout.getLineStart(line);
                         end = staticLayout.getLineVisibleEnd(line);
-                        strLine = text.subSequence(start, end).toString();
+                        strLine = text.subSequence(start, end);
                         if (line < totalLines - 1) { // 每一行结尾加换行符防止行错乱
                             resultBuilder.append(strLine).append("\n");
                         } else { // 最后一行
