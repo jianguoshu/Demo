@@ -7,15 +7,4 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
-       
-    <declare-styleable name="CollapsibleTextView">  name值表示这是那个组件的属性
-        <attr name="expend_text" format="string" />
-        <attr name="collapse_text" format="string" />
-        <attr name="ellipsis_symbol" format="string" />
-        <attr name="collapsible_by_hand" format="boolean" />
-        <attr name="collapse_switcher_color" format="color" />
-        <attr name="collapse_switcher_color_id" format="reference" />
-           
-    </declare-styleable>
-
 </resources>
