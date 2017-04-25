@@ -3,15 +3,17 @@ package com.example.douzi.expendabletextview;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.Layout;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.StaticLayout;
+import android.text.TextPaint;
 import android.text.TextUtils;
-import android.text.style.ForegroundColorSpan;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -24,8 +26,11 @@ public class CollapsibleTextView extends TextView implements View.OnLayoutChange
     private int width;
     private CharSequence mText;
 
-    private String expendText = "...全文";
+    private String expendText = "全文";
+    private String ellipsisSymbol = "...";
     private String collapseText = "收起";
+    private boolean collapsibleByHand = false; // 是否显示收起功能
+    private int collapseSwitcherColor = Color.RED; // 展开、收起文字的颜色
 
     public CollapsibleTextView(Context context) {
         super(context);
@@ -83,7 +88,7 @@ public class CollapsibleTextView extends TextView implements View.OnLayoutChange
                         if (line < maxLines - 1) { // 每一行结尾加换行符防止行错乱
                             resultBuilder.append(strLine).append("\n");
                         } else { // 最后一行
-                            float widthExtra = paint.measureText(expendText);
+                            float widthExtra = paint.measureText(expendText + ellipsisSymbol);
                             int indexCharLast = strLine.length() - 1;
                             while (widthExtra > 0 && indexCharLast >= 0) {
                                 float widthCharLast = paint.measureText(String.valueOf(strLine.charAt(indexCharLast)));
@@ -91,12 +96,14 @@ public class CollapsibleTextView extends TextView implements View.OnLayoutChange
                                 indexCharLast--;
                             }
                             resultBuilder.append(strLine.substring(0, indexCharLast + 1));
-                            resultBuilder.append(expendText);
-                            ForegroundColorSpan span = new ForegroundColorSpan(Color.RED);
-                            resultBuilder.setSpan(span, resultBuilder.length() - 2, resultBuilder.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                            resultBuilder.append(ellipsisSymbol).append(expendText);
+                            ClickableSpan clickableSpan = getClickableSpan();
+                            resultBuilder.setSpan(clickableSpan, resultBuilder.length() - expendText.length(), resultBuilder.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                            setHighlightColor(Color.TRANSPARENT);
+                            setMovementMethod(LinkMovementMethod.getInstance());
                         }
                     }
-                } else {
+                } else if (collapsibleByHand) {
                     for (int line = 0; line < totalLines; line++) {
                         start = staticLayout.getLineStart(line);
                         end = staticLayout.getLineVisibleEnd(line);
@@ -111,22 +118,36 @@ public class CollapsibleTextView extends TextView implements View.OnLayoutChange
                                 resultBuilder.append("\n");
                             }
                             resultBuilder.append(collapseText);
-                            ForegroundColorSpan span = new ForegroundColorSpan(Color.RED);
-                            resultBuilder.setSpan(span, resultBuilder.length() - 2, resultBuilder.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                            ClickableSpan clickableSpan = getClickableSpan();
+                            resultBuilder.setSpan(clickableSpan, resultBuilder.length() - collapseText.length(), resultBuilder.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                            setHighlightColor(Color.TRANSPARENT);
+                            setMovementMethod(LinkMovementMethod.getInstance());
                         }
                     }
                 }
-            } else {
-                if (text != null) {
-                    resultBuilder.append(text);
-                }
-            }
-        } else {
-            if (text != null) {
-                resultBuilder.append(text);
             }
         }
+        if (resultBuilder.length() == 0 && text != null) {
+            resultBuilder.append(text);
+        }
         return resultBuilder;
+    }
+
+    @NonNull
+    private ClickableSpan getClickableSpan() {
+        return new ClickableSpan() {
+            @Override
+            public void onClick(View widget) {
+                collapse(!isCollapsed);
+            }
+
+            @Override
+            public void updateDrawState(TextPaint ds) {
+                super.updateDrawState(ds);
+                ds.setColor(collapseSwitcherColor);
+                ds.setUnderlineText(false);
+            }
+        };
     }
 
     public boolean collapsible() {
