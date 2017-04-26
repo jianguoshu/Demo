@@ -6,6 +6,7 @@ import android.graphics.Paint;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.Layout;
+import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.StaticLayout;
@@ -85,12 +86,16 @@ public class CollapsibleTextView extends TextView implements View.OnLayoutChange
 
     @Override
     public void setText(CharSequence text, BufferType type) {
-        SpannableStringBuilder textNew = processText(text);
+        mText = text;
+        CharSequence textNew = processText(text);
         super.setText(textNew, type);
+        if (mText != null && textNew instanceof Spannable) {
+            setHighlightColor(Color.TRANSPARENT);
+            setMovementMethod(LinkMovementMethod.getInstance());
+        }
     }
 
-    private SpannableStringBuilder processText(CharSequence text) {
-        mText = text;
+    private CharSequence processText(CharSequence text) {
         SpannableStringBuilder resultBuilder = new SpannableStringBuilder();
         if (width > 0 && mText != null) {
             StaticLayout staticLayout = new StaticLayout(text, 0, text.length(), getPaint(), width,
@@ -120,8 +125,6 @@ public class CollapsibleTextView extends TextView implements View.OnLayoutChange
                             resultBuilder.append(ellipsisSymbol).append(expendText);
                             ClickableSpan clickableSpan = getClickableSpan();
                             resultBuilder.setSpan(clickableSpan, resultBuilder.length() - expendText.length(), resultBuilder.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-                            setHighlightColor(Color.TRANSPARENT);
-                            setMovementMethod(LinkMovementMethod.getInstance());
                         }
                     }
                 } else if (collapsibleByHand) {
@@ -141,15 +144,13 @@ public class CollapsibleTextView extends TextView implements View.OnLayoutChange
                             resultBuilder.append(collapseText);
                             ClickableSpan clickableSpan = getClickableSpan();
                             resultBuilder.setSpan(clickableSpan, resultBuilder.length() - collapseText.length(), resultBuilder.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-                            setHighlightColor(Color.TRANSPARENT);
-                            setMovementMethod(LinkMovementMethod.getInstance());
                         }
                     }
                 }
             }
         }
-        if (resultBuilder.length() == 0 && text != null) {
-            resultBuilder.append(text);
+        if (resultBuilder.length() == 0) {
+            return text;
         }
         return resultBuilder;
     }
@@ -198,7 +199,7 @@ public class CollapsibleTextView extends TextView implements View.OnLayoutChange
     private void collapseForce(boolean collapse) {
         isCollapsed = collapse;
         if (isCollapsed) {
-            super.setMaxLines(maxLines);
+            super.setMaxLines(Integer.MAX_VALUE);
         } else {
             super.setMaxLines(Integer.MAX_VALUE);
         }
