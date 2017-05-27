@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         Log.i("douzi", "onDestroy");
         Log.i("dev", "C1");
+        Log.i("dev", "C2");
 
         super.onDestroy();
         new Handler().postDelayed(new Runnable() {
