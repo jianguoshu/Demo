@@ -25,6 +25,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         Log.i("douzi", "onDestroy");
+        Log.i("test1", "C1");
+
         super.onDestroy();
         new Handler().postDelayed(new Runnable() {
             @Override
