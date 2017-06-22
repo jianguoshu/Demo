@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="FlowLayout">
+        <attr name="childFullVisual" format="boolean"></attr>
+        <attr name="maxBlankWidth" format="dimension"></attr>
+        <attr name="gravity">
+            <flag name="left" value="0x0001" />
+            <flag name="right" value="0x0002" />
+            <flag name="center_horizontal" value="0x0004" />
+            <flag name="top" value="0x0010" />
+            <flag name="bottom" value="0x0020" />
+            <flag name="center_vertical" value="0x0030" />
+            <flag name="center" value="0034" />
+        </attr>
+    </declare-styleable>
+</resources>

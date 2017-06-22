@@ -8,6 +8,7 @@ import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
+import android.text.style.ImageSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -34,14 +35,21 @@ public class MainActivity extends Activity {
         textView2.setMaxLines(3);
         textView2.setEllipsize(TextUtils.TruncateAt.END);
         String text = "我来试一下test我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下我来试一下";
-        text = "gagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagaggagagagaga";
-        SpannableString builder = new SpannableString(text);
+//        text = "gagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagagaggagagagaga";
+        SpannableStringBuilder builder = new SpannableStringBuilder(text);
         ForegroundColorSpan span = new ForegroundColorSpan(Color.RED);
-        builder.setSpan(span, 0, 10, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+
+        SpannableString spannableString = new SpannableString("haha");
+        ImageSpan imageSpan = new ImageSpan(getResources().getDrawable(R.drawable.comment_like_ic02));
+        int wdith = (int) textView2.getPaint().measureText("国") * 2;
+        imageSpan.getDrawable().setBounds(0, 0, wdith, wdith);
+        spannableString.setSpan(imageSpan, 0, spannableString.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+
+        builder.append(spannableString);
         textView2.setText(builder);
         textView2.collapse(true);
         textView2.setCollapsibleByHand(true);
-
+//
         FrameLayout textContainer = (FrameLayout) this.findViewById(R.id.fl_text_container);
         textContainer.addView(contentView);
 

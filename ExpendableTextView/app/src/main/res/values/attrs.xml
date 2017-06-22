@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="CollapsibleTextView">
+        <attr name="expend_for_default" format="boolean" />
         <attr name="expend_text" format="string" />
         <attr name="collapse_text" format="string" />
         <attr name="ellipsis_symbol" format="string" />
