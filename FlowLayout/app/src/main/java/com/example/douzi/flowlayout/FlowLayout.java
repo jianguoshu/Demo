@@ -69,7 +69,7 @@ public class FlowLayout extends ViewGroup{
         int maxHeightInLine = 0; // 一行中所有child的max height
 
         for (int i = 0; i < count; i++) {
-            if (lineCur > maxLine) {// 超出最大行数限制，不再measure
+            if (outLines(lineCur)) {// 超出最大行数限制，不再measure
                 break;
             }
             final View child = getChildAt(i);
@@ -121,7 +121,7 @@ public class FlowLayout extends ViewGroup{
                         heightUsed += maxHeightInLine;
 
                         lineCur++;
-                        if (lineCur > maxLine) { // 新的一行超出最大行数限制，结束measure；并清除下一行中view造成的影响
+                        if (outLines(lineCur)) { // 新的一行超出最大行数限制，结束measure；并清除下一行中view造成的影响
                             widthUsedInLine = 0;
                             maxHeightInLine = 0;
                             break;
@@ -173,7 +173,7 @@ public class FlowLayout extends ViewGroup{
         int maxHeight = 0;
         List<View> lineViews = new ArrayList<>();
         for (int i = 0; i < count; i++) {
-            if (lineCur > maxLine) { // 超出最大行数限制，停止layout
+            if (outLines(lineCur)) { // 超出最大行数限制，停止layout
                 return;
             }
             View child = getChildAt(i);
@@ -200,6 +200,10 @@ public class FlowLayout extends ViewGroup{
             layoutLine(lineViews, width, widthUsed, heightUsed, heightUsed + maxHeight);
             lineCur++;
         }
+    }
+
+    private boolean outLines(int lineCur) {
+        return lineCur > maxLine;
     }
 
     /**
