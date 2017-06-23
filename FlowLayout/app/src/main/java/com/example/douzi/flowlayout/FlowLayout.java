@@ -304,6 +304,7 @@ public class FlowLayout extends ViewGroup {
         r -= lp.rightMargin;
         b -= lp.bottomMargin;
 
+        view.requestLayout();
         view.layout(l, t, r, b);
     }
 

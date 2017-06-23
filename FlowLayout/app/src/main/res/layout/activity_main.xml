@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:padding="10dp"
-        app:childFullVisual="true"
+        app:childFullVisual="false"
         app:maxLine="3"
         app:maxBlankWidth="20dp">
 
@@ -477,9 +477,18 @@
     <TextView
         android:id="@+id/tv_next_page"
         android:layout_width="match_parent"
+        android:layout_above="@+id/auto_next_page"
+        android:layout_height="50dp"
+        android:background="#009900"
+        android:gravity="center"
+        android:text="下一页" />
+
+    <TextView
+        android:id="@+id/auto_next_page"
+        android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_alignParentBottom="true"
-        android:background="#009900"
+        android:background="#000099"
         android:gravity="center"
         android:text="下一页" />
 </RelativeLayout>
