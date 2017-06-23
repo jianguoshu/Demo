@@ -9,8 +9,6 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 import java.util.List;
 
-import static android.view.View.MEASURED_STATE_TOO_SMALL;
-
 /**
  * Created by douzi on 2017/6/22.
  */
@@ -30,9 +28,10 @@ public class FlowLayout extends ViewGroup{
     public static final int CENTER = CENTER_HORIZONTAL | CENTER_VERTICAL;
 
     private int gravity = LEFT | CENTER_VERTICAL;
-    private boolean childFullVisual;
-    private float maxBlankWidth;
-    private int lineCur = 1;
+    private boolean childFullVisual; // 标示child是否完整显示或者可以压缩宽度
+    private float maxBlankWidth; // 标示每行末尾可显示空白的最大尺寸
+    private int maxLine; // 限制显示行数
+//    private int visualViewNum = 0; // 记录可见的view个数
 
     public FlowLayout(Context context) {
         this(context, null);
@@ -48,14 +47,14 @@ public class FlowLayout extends ViewGroup{
         childFullVisual = ta.getBoolean(R.styleable.FlowLayout_childFullVisual, true);
         maxBlankWidth = ta.getDimension(R.styleable.FlowLayout_maxBlankWidth, 0);
         gravity = ta.getInt(R.styleable.FlowLayout_gravity, LEFT | CENTER_VERTICAL);
+        maxLine = ta.getInt(R.styleable.FlowLayout_maxLine, Integer.MAX_VALUE);
         ta.recycle();
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 
-        // reset
-        lineCur = 1;
+        int lineCur = 1; // 记录当前计算到的line num
 
         boolean isLintStart = true;
 
@@ -70,15 +69,17 @@ public class FlowLayout extends ViewGroup{
         int maxHeightInLine = 0; // 一行中所有child的max height
 
         for (int i = 0; i < count; i++) {
+            if (lineCur > maxLine) {// 超出最大行数限制，不再measure
+                break;
+            }
             final View child = getChildAt(i);
             measureChildWithMargins(child, widthMeasureSpec, 0, heightMeasureSpec, 0);
             ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) child.getLayoutParams();
             int childWidth = child.getMeasuredWidth() + lp.leftMargin + lp.rightMargin;
             int childHeight = child.getMeasuredHeight() + lp.topMargin + lp.bottomMargin;
 
-            if (isLintStart) {
-                if (maxWidth - childWidth <= 0) {
-                    // new line
+            if (isLintStart) { // 新的一行开始处
+                if (maxWidth - childWidth <= 0) { // 一个child占满一行--new line
                     maxWidthAllLine = Math.max(maxWidthAllLine, childWidth);
                     heightUsed += childHeight;
 
@@ -86,17 +87,15 @@ public class FlowLayout extends ViewGroup{
                     isLintStart = true;
                     widthUsedInLine = 0;
                     maxHeightInLine = 0;
-                } else {
+                } else { // 一行中第一个child
                     widthUsedInLine += childWidth;
                     maxWidthAllLine = Math.max(maxWidthAllLine, widthUsedInLine);
                     maxHeightInLine = Math.max(maxHeightInLine, childHeight);
                     isLintStart = false;
                 }
                 continue;
-            } else {
-
-                // new line
-                if (maxWidth - widthUsedInLine - childWidth == 0) {
+            } else {// 一行中已有child
+                if (maxWidth - widthUsedInLine - childWidth == 0) { // child占满了剩余的空间--new line
                     maxWidthAllLine = Math.max(maxWidthAllLine, maxWidth);
                     maxHeightInLine = Math.max(maxHeightInLine, childHeight);
                     heightUsed += maxHeightInLine;
@@ -108,7 +107,7 @@ public class FlowLayout extends ViewGroup{
                     continue;
                 }
 
-                if (maxWidth - widthUsedInLine - childWidth > 0) {
+                if (maxWidth - widthUsedInLine - childWidth > 0) { // child未占满剩余空间，continue
                     widthUsedInLine += childWidth;
                     maxWidthAllLine = Math.max(maxWidthAllLine, widthUsedInLine);
                     maxHeightInLine = Math.max(maxHeightInLine, childHeight);
@@ -116,17 +115,22 @@ public class FlowLayout extends ViewGroup{
                     continue;
                 }
 
-                if (maxWidth - widthUsedInLine - childWidth < 0) {
-                    if (needNewLine(maxWidth, widthUsedInLine, childWidth)) {
-                        // new line
+                if (maxWidth - widthUsedInLine - childWidth < 0) { //  剩余空间不能完整显示child
+                    if (needNewLine(maxWidth, widthUsedInLine, childWidth)) { // 需要新开一行--new line
                         maxWidthAllLine = Math.max(maxWidthAllLine, widthUsedInLine);
                         heightUsed += maxHeightInLine;
 
-                        widthUsedInLine = childWidth;
-                        maxHeightInLine = childHeight;
                         lineCur++;
-                        isLintStart = false;
-                    } else {
+                        if (lineCur > maxLine) { // 新的一行超出最大行数限制，结束measure；并清除下一行中view造成的影响
+                            widthUsedInLine = 0;
+                            maxHeightInLine = 0;
+                            break;
+                        } else {
+                            widthUsedInLine = childWidth;
+                            maxHeightInLine = childHeight;
+                            isLintStart = false;
+                        }
+                    } else { // 压缩child填充剩余空间
                         measureChildWithMargins(child, widthMeasureSpec, widthUsedInLine, heightMeasureSpec, heightUsed);
                         lp = (ViewGroup.MarginLayoutParams) child.getLayoutParams();
                         childWidth = child.getMeasuredWidth() + lp.leftMargin + lp.rightMargin;
@@ -159,6 +163,8 @@ public class FlowLayout extends ViewGroup{
      */
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        int lineCur = 1;
+
         int width = r - l - getPaddingLeft() - getPaddingRight(); // 处理padding
         int count = getChildCount();
 
@@ -167,6 +173,9 @@ public class FlowLayout extends ViewGroup{
         int maxHeight = 0;
         List<View> lineViews = new ArrayList<>();
         for (int i = 0; i < count; i++) {
+            if (lineCur > maxLine) { // 超出最大行数限制，停止layout
+                return;
+            }
             View child = getChildAt(i);
             final ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) child.getLayoutParams();
             int childWidth = child.getMeasuredWidth() + lp.leftMargin + lp.rightMargin;
@@ -177,6 +186,7 @@ public class FlowLayout extends ViewGroup{
                 lineViews.add(child);
             } else {
                 layoutLine(lineViews, width, widthUsed, heightUsed, heightUsed + maxHeight);
+                lineCur++;
                 heightUsed += maxHeight;
 
                 lineViews.clear();
@@ -188,6 +198,7 @@ public class FlowLayout extends ViewGroup{
 
         if (lineViews.size() > 0) {
             layoutLine(lineViews, width, widthUsed, heightUsed, heightUsed + maxHeight);
+            lineCur++;
         }
     }
 

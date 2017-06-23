@@ -3,6 +3,7 @@
     <declare-styleable name="FlowLayout">
         <attr name="childFullVisual" format="boolean"></attr>
         <attr name="maxBlankWidth" format="dimension"></attr>
+        <attr name="maxLine" format="integer"></attr>
         <attr name="gravity">
             <flag name="left" value="0x0001" />
             <flag name="right" value="0x0002" />
