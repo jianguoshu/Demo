@@ -31,7 +31,7 @@ public class FlowLayout extends ViewGroup{
     private boolean childFullVisual; // 标示child是否完整显示或者可以压缩宽度
     private float maxBlankWidth; // 标示每行末尾可显示空白的最大尺寸
     private int maxLine; // 限制显示行数
-//    private int visualViewNum = 0; // 记录可见的view个数
+    private int visualViewNum = 0; // 记录可见的child个数
 
     public FlowLayout(Context context) {
         this(context, null);
@@ -166,6 +166,8 @@ public class FlowLayout extends ViewGroup{
      */
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        visualViewNum = 0;
+
         int lineCur = 1;
 
         int width = r - l - getPaddingLeft() - getPaddingRight(); // 处理padding
@@ -264,6 +266,7 @@ public class FlowLayout extends ViewGroup{
      * @param yEnd
      */
     private void layoutView(View view, int xStart, int width, int height, int yStart, int yEnd) {
+        visualViewNum++;
         int gravityVertical = this.gravity & VERTICAL_GRAVITY_MASK;
 
         int l = xStart;
