@@ -360,4 +360,28 @@ public class FlowLayout extends ViewGroup{
         return result;
     }
 
+
+    public void setGravity(int gravity) {
+        this.gravity = gravity;
+    }
+
+    public void setChildFullVisual(boolean childFullVisual) {
+        this.childFullVisual = childFullVisual;
+    }
+
+    public void setMaxBlankWidth(float maxBlankWidth) {
+        this.maxBlankWidth = maxBlankWidth;
+    }
+
+    public void setMaxLine(int maxLine) {
+        this.maxLine = maxLine;
+    }
+
+    public void setVisualViewNum(int visualViewNum) {
+        this.visualViewNum = visualViewNum;
+    }
+
+    public int getVisualViewNum() {
+        return visualViewNum;
+    }
 }
