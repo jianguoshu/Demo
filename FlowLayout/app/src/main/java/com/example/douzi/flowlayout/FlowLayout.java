@@ -2,6 +2,7 @@ package com.example.douzi.flowlayout;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.support.annotation.Px;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +14,7 @@ import java.util.List;
  * Created by douzi on 2017/6/22.
  */
 
-public class FlowLayout extends ViewGroup{
+public class FlowLayout extends ViewGroup {
     public static final String TAG = "FlowLayout2";
     public static final int HORIZONTAL_GRAVITY_MASK = 0x000F;
     public static final int LEFT = 0x0001;
@@ -69,7 +70,7 @@ public class FlowLayout extends ViewGroup{
         int maxHeightInLine = 0; // 一行中所有child的max height
 
         for (int i = 0; i < count; i++) {
-            if (outLines(lineCur)) {// 超出最大行数限制，不再measure
+            if (outLines(lineCur, maxLine)) {// 超出最大行数限制，不再measure
                 break;
             }
             final View child = getChildAt(i);
@@ -77,7 +78,7 @@ public class FlowLayout extends ViewGroup{
                 continue;
             }
             measureChildWithMargins(child, widthMeasureSpec, 0, heightMeasureSpec, 0);
-            ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) child.getLayoutParams();
+            LayoutParams lp = (LayoutParams) child.getLayoutParams();
             int childWidth = child.getMeasuredWidth() + lp.leftMargin + lp.rightMargin;
             int childHeight = child.getMeasuredHeight() + lp.topMargin + lp.bottomMargin;
 
@@ -124,7 +125,7 @@ public class FlowLayout extends ViewGroup{
                         heightUsed += maxHeightInLine;
 
                         lineCur++;
-                        if (outLines(lineCur)) { // 新的一行超出最大行数限制，结束measure；并清除下一行中view造成的影响
+                        if (outLines(lineCur, maxLine)) { // 新的一行超出最大行数限制，结束measure；并清除下一行中view造成的影响
                             widthUsedInLine = 0;
                             maxHeightInLine = 0;
                             break;
@@ -135,7 +136,7 @@ public class FlowLayout extends ViewGroup{
                         }
                     } else { // 压缩child填充剩余空间
                         measureChildWithMargins(child, widthMeasureSpec, widthUsedInLine, heightMeasureSpec, heightUsed);
-                        lp = (ViewGroup.MarginLayoutParams) child.getLayoutParams();
+                        lp = (LayoutParams) child.getLayoutParams();
                         childWidth = child.getMeasuredWidth() + lp.leftMargin + lp.rightMargin;
                         childHeight = child.getMeasuredHeight() + lp.topMargin + lp.bottomMargin;
                         widthUsedInLine += childWidth;
@@ -178,14 +179,14 @@ public class FlowLayout extends ViewGroup{
         int maxHeight = 0;
         List<View> lineViews = new ArrayList<>();
         for (int i = 0; i < count; i++) {
-            if (outLines(lineCur)) { // 超出最大行数限制，停止layout
+            if (outLines(lineCur, maxLine)) { // 超出最大行数限制，停止layout
                 return;
             }
             View child = getChildAt(i);
             if (child.getVisibility() == GONE) {
                 continue;
             }
-            final ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) child.getLayoutParams();
+            final LayoutParams lp = (LayoutParams) child.getLayoutParams();
             int childWidth = child.getMeasuredWidth() + lp.leftMargin + lp.rightMargin;
             int childHeight = child.getMeasuredHeight() + lp.topMargin + lp.bottomMargin;
             if (!needNewLine(width, widthUsed, childWidth)) {
@@ -210,15 +211,16 @@ public class FlowLayout extends ViewGroup{
         }
     }
 
-    private boolean outLines(int lineCur) {
+    private boolean outLines(int lineCur, int maxLine) {
         return lineCur > maxLine;
     }
 
     /**
      * layout每一行, 计算时child的大小包含margin
+     *
      * @param views
      * @param widthTotal 可用宽度，即不包含padding区域
-     * @param widthUsed 一行中所有view需要的宽度之和
+     * @param widthUsed  一行中所有view需要的宽度之和
      * @param yStart
      * @param yEnd
      */
@@ -230,7 +232,7 @@ public class FlowLayout extends ViewGroup{
         int xStart = 0;
         for (int i = 0; i < size; i++) {
             View child = views.get(i);
-            final ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) child.getLayoutParams();
+            final LayoutParams lp = (LayoutParams) child.getLayoutParams();
             int childWidth = child.getMeasuredWidth() + lp.leftMargin + lp.rightMargin;
             int childHeight = child.getMeasuredHeight() + lp.topMargin + lp.bottomMargin;
 
@@ -258,6 +260,7 @@ public class FlowLayout extends ViewGroup{
 
     /**
      * 参数的值受margin的影响，需要在此方法中排除margin的影响
+     *
      * @param view
      * @param xStart
      * @param width
@@ -293,7 +296,7 @@ public class FlowLayout extends ViewGroup{
                 break;
         }
 
-        final ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
+        final LayoutParams lp = (LayoutParams) view.getLayoutParams();
 
         // 去除margin
         l += lp.leftMargin;
@@ -305,8 +308,8 @@ public class FlowLayout extends ViewGroup{
     }
 
     /**
-     * @param total 一行的全部空间
-     * @param used  已用的空间
+     * @param total   一行的全部空间
+     * @param used    已用的空间
      * @param require 新需要的空间
      * @return
      */
@@ -324,24 +327,28 @@ public class FlowLayout extends ViewGroup{
     }
 
     @Override
-    public ViewGroup.LayoutParams generateLayoutParams(AttributeSet attrs) {
-        return new ViewGroup.MarginLayoutParams(getContext(), attrs);
+    public LayoutParams generateLayoutParams(AttributeSet attrs) {
+        return new FlowLayout.LayoutParams(getContext(), attrs);
     }
 
     @Override
-    protected ViewGroup.LayoutParams generateDefaultLayoutParams() {
-        return new ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+    protected LayoutParams generateDefaultLayoutParams() {
+        return new FlowLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
     }
 
     @Override
-    protected ViewGroup.LayoutParams generateLayoutParams(ViewGroup.LayoutParams p) {
-        return new ViewGroup.MarginLayoutParams(p);
+    protected LayoutParams generateLayoutParams(ViewGroup.LayoutParams p) {
+        if (p instanceof MarginLayoutParams) {
+            return new FlowLayout.LayoutParams((MarginLayoutParams)p);
+        } else {
+            return new FlowLayout.LayoutParams(p);
+        }
     }
 
     public static int resolveSizeAndState(int size, int measureSpec) {
         int result = size;
         int specMode = View.MeasureSpec.getMode(measureSpec);
-        int specSize =  View.MeasureSpec.getSize(measureSpec);
+        int specSize = View.MeasureSpec.getSize(measureSpec);
         switch (specMode) {
             case View.MeasureSpec.UNSPECIFIED:
                 result = size;
@@ -383,5 +390,24 @@ public class FlowLayout extends ViewGroup{
 
     public int getVisualViewNum() {
         return visualViewNum;
+    }
+
+    public static class LayoutParams extends MarginLayoutParams {
+
+        public LayoutParams(Context c, AttributeSet attrs) {
+            super(c, attrs);
+        }
+
+        public LayoutParams(@Px int width, @Px int height) {
+            super(width, height);
+        }
+
+        public LayoutParams(MarginLayoutParams source) {
+            super(source);
+        }
+
+        public LayoutParams(ViewGroup.LayoutParams source) {
+            super(source);
+        }
     }
 }
