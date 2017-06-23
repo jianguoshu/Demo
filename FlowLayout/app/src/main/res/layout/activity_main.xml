@@ -6,12 +6,14 @@
     android:layout_height="match_parent"
     tools:context="com.example.douzi.flowlayout.MainActivity">
 
-    <com.example.douzi.flowlayout.FlowLayout
+    <com.example.douzi.flowlayout.PagerFlowLayout
+        android:id="@+id/pager"
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:padding="10dp"
-        android:layout_height="wrap_content"
-        app:childFullVisual="false"
+        app:childFullVisual="true"
+        app:maxLine="3"
         app:maxBlankWidth="20dp">
 
         <TextView
@@ -294,8 +296,8 @@
             android:background="#009900"
             android:ellipsize="end"
             android:maxLines="1"
-            android:visibility="gone"
             android:text=" 22 Hello World!"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
@@ -470,5 +472,14 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-    </com.example.douzi.flowlayout.FlowLayout>
+    </com.example.douzi.flowlayout.PagerFlowLayout>
+
+    <TextView
+        android:id="@+id/tv_next_page"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:background="#009900"
+        android:gravity="center"
+        android:text="下一页" />
 </RelativeLayout>

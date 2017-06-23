@@ -338,6 +338,9 @@ public class FlowLayout extends ViewGroup {
 
     @Override
     protected LayoutParams generateLayoutParams(ViewGroup.LayoutParams p) {
+        if (p == null) {
+            p = generateDefaultLayoutParams();
+        }
         if (p instanceof MarginLayoutParams) {
             return new FlowLayout.LayoutParams((MarginLayoutParams)p);
         } else {

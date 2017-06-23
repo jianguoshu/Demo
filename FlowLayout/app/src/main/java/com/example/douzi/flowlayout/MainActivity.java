@@ -3,6 +3,12 @@ package com.example.douzi.flowlayout;
 import android.app.Activity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.view.View;
+import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends Activity {
 
@@ -10,5 +16,27 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        final PagerFlowLayout pagerFlowLayout = (PagerFlowLayout) this.findViewById(R.id.pager);
+        pagerFlowLayout.setViews(initViews());
+        View btnNextPage = this.findViewById(R.id.tv_next_page);
+        btnNextPage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pagerFlowLayout.nextPage();
+            }
+        });
+    }
+
+    private List<View> initViews() {
+        List<View> views = new ArrayList<>();
+        for (int i = 0; i < 50; i++) {
+            TextView view = new TextView(this);
+            view.setText(" " + i + " 测试仪下呀");
+            view.setMaxLines(1);
+            view.setEllipsize(TextUtils.TruncateAt.END);
+            views.add(view);
+        }
+        return views;
     }
 }
