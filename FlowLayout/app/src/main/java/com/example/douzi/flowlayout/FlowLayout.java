@@ -73,6 +73,9 @@ public class FlowLayout extends ViewGroup{
                 break;
             }
             final View child = getChildAt(i);
+            if (child.getVisibility() == GONE) {
+                continue;
+            }
             measureChildWithMargins(child, widthMeasureSpec, 0, heightMeasureSpec, 0);
             ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) child.getLayoutParams();
             int childWidth = child.getMeasuredWidth() + lp.leftMargin + lp.rightMargin;
@@ -177,6 +180,9 @@ public class FlowLayout extends ViewGroup{
                 return;
             }
             View child = getChildAt(i);
+            if (child.getVisibility() == GONE) {
+                continue;
+            }
             final ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) child.getLayoutParams();
             int childWidth = child.getMeasuredWidth() + lp.leftMargin + lp.rightMargin;
             int childHeight = child.getMeasuredHeight() + lp.topMargin + lp.bottomMargin;
