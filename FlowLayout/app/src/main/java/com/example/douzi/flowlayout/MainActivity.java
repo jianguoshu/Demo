@@ -19,7 +19,35 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        final List<String> source = new ArrayList<>();
+        for (int i = 0; i < 25; i++) {
+            source.add(" " + i + "测试以下呀哈");
+        }
+
         final PagerFlowLayout pagerFlowLayout = (PagerFlowLayout) this.findViewById(R.id.pager);
+        pagerFlowLayout.setAdapter(new PagerFlowLayout.Adapter() {
+            @Override
+            public int getCount() {
+                return source.size();
+            }
+
+            @Override
+            public View getView(int position) {
+                TextView view = new TextView(MainActivity.this);
+                view.setText(source.get(position));
+                return view;
+            }
+
+            @Override
+            public int getItemViewType(int position) {
+                return 1;
+            }
+
+            @Override
+            public int getViewTypeCount() {
+                return 1;
+            }
+        });
 //        pagerFlowLayout.nextPage();
         View btnNextPage = this.findViewById(R.id.tv_next_page);
         btnNextPage.setOnClickListener(new View.OnClickListener() {
@@ -29,12 +57,12 @@ public class MainActivity extends Activity {
             }
         });
 //
-        View autoNextPage = this.findViewById(R.id.auto_next_page);
-        autoNextPage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-            }
-        });
+//        View autoNextPage = this.findViewById(R.id.auto_next_page);
+//        autoNextPage.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//            }
+//        });
     }
 
     private List<View> initViews() {

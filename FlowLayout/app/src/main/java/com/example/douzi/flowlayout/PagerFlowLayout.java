@@ -3,7 +3,6 @@ package com.example.douzi.flowlayout;
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -20,9 +19,16 @@ public class PagerFlowLayout extends FlowLayout {
     private int mWidthMeasureSpec;
     private int mHeightMeasureSpec;
     private List<View> mPageViews = new ArrayList<>();
-    private int index = 0;
+    private int position = 0;
+    private int itemCount = 0;
     private Adapter mAdapter;
     private PagerObserver mPagerObserver;
+
+    private OnItemClickListener onItemClickListener;
+
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
+    }
 
     public PagerFlowLayout(Context context) {
         super(context);
@@ -49,14 +55,19 @@ public class PagerFlowLayout extends FlowLayout {
         }
         mAdapter = adapter;
         if (mAdapter == null) {
-            // TODO: 2017/6/26
+            position = 0;
+            itemCount = 0;
+            mPageViews.clear();
+            removeAllViews();
         } else {
-            // TODO: 2017/6/26
+            position = 0;
+            itemCount = adapter.getCount();
             if (mPagerObserver == null) {
                 mPagerObserver = new PagerObserver() {
                     @Override
                     public void onDataSetChanged() {
-                        // TODO: 2017/6/26
+                        position -= mPageViews.size();
+                        nextPage();
                     }
                 };
             }
@@ -64,11 +75,12 @@ public class PagerFlowLayout extends FlowLayout {
     }
 
     public void nextPage() {
-        Log.i(FlowLayoutHelper.class.getSimpleName(), "nextPage");
-
-
         removeAllViewsInLayout();
         mPageViews.clear();
+
+        if (itemCount <= 0) {
+            return;
+        }
 
         FlowLayoutHelper layoutHelper = new FlowLayoutHelper();
         FlowLayoutHelper.MeasureResult result = new FlowLayoutHelper.MeasureResult();
@@ -82,6 +94,10 @@ public class PagerFlowLayout extends FlowLayout {
 
         layoutHelper.endMeasure();
 
+        if (result.invalidChildNum > 0) {
+            position -= result.invalidChildNum;
+        }
+
         for (View view : mPageViews) {
             addViewInLayout(view, -1, view.getLayoutParams());
         }
@@ -92,17 +108,29 @@ public class PagerFlowLayout extends FlowLayout {
 
     private View nextChild() {
 
-        TextView view = new TextView(getContext());
-        view.setSingleLine();
-        view.setLayoutParams(new LayoutParams(480, ViewGroup.LayoutParams.WRAP_CONTENT));
-        view.setEllipsize(TextUtils.TruncateAt.END);
-        if (index >= 25) {
-            index = 0;
+        if (position >= itemCount) {
+            position = position % itemCount;
         }
 
-        view.setText(" " + index + " 测试以下呀");
-        index++;
+        while(position < 0){
+            position += itemCount;
+        }
 
+        final int positionCur = position;
+        position++;
+
+        View view = mAdapter.getView(positionCur);
+        if (view.getLayoutParams() == null) {
+            view.setLayoutParams(generateDefaultLayoutParams());
+        }
+        view.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (onItemClickListener != null) {
+                    onItemClickListener.onItemClicked(positionCur);
+                }
+            }
+        });
         return view;
     }
 
