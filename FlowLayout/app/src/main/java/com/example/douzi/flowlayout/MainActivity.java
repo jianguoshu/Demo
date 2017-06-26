@@ -20,8 +20,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         final PagerFlowLayout pagerFlowLayout = (PagerFlowLayout) this.findViewById(R.id.pager);
-        pagerFlowLayout.setViews(initViews());
-        pagerFlowLayout.nextPage();
+//        pagerFlowLayout.nextPage();
         View btnNextPage = this.findViewById(R.id.tv_next_page);
         btnNextPage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -29,15 +28,11 @@ public class MainActivity extends Activity {
                 pagerFlowLayout.nextPage();
             }
         });
-
+//
         View autoNextPage = this.findViewById(R.id.auto_next_page);
         autoNextPage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                for (int i = 0; i < 1000; i++) {
-                    pagerFlowLayout.nextPage();
-                    Log.i(FlowLayout.TAG, "autoNextPage : " + i);
-                }
             }
         });
     }
