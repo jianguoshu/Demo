@@ -2,9 +2,11 @@ package com.example.douzi.flowlayout;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.SparseArray;
 import android.view.View;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -15,15 +17,16 @@ public class PagerFlowLayout extends FlowLayout {
 
     private int mWidthMeasureSpec;
     private int mHeightMeasureSpec;
-    private List<View> mPageViews = new ArrayList<>();
-    private int position = 0;
-    private int itemCount = 0;
+    private List<View> mPagerViews = new ArrayList<>();
+    private ViewCache viewCache = new ViewCache();
+    private int mPosition = 0; // 保存child的下一个position，比当前position大1
+    private int childViewCount = 0;
     private Adapter mAdapter;
     private PagerObserver mPagerObserver;
 
     private OnItemClickListener onItemClickListener;
-    private boolean needNextPage;
-    private boolean hasMeasureStart;
+    private boolean needNextPage = false;
+    private boolean hasMeasureStart = false;
 
     public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
         this.onItemClickListener = onItemClickListener;
@@ -43,33 +46,37 @@ public class PagerFlowLayout extends FlowLayout {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        hasMeasureStart = true;
         mWidthMeasureSpec = widthMeasureSpec;
         mHeightMeasureSpec = heightMeasureSpec;
-        if (isNeedNextPage()) {
+        hasMeasureStart = true;
+        if (needNextPage) {
+            needNextPage = false;
             nextPageWithoutLayout();
         }
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 
-    public void setAdapter(Adapter adapter) {
+    public void setAdapter(final Adapter adapter) {
         if (mAdapter != null && mPagerObserver != null) {
             mAdapter.unregisterDataSetObserver(mPagerObserver);
         }
         mAdapter = adapter;
         if (mAdapter == null) {
-            position = 0;
-            itemCount = 0;
-            mPageViews.clear();
+            mPosition = 0;
+            childViewCount = 0;
+            mPagerViews.clear();
+            viewCache.clear();
             removeAllViews();
         } else {
-            position = 0;
-            itemCount = adapter.getCount();
+            mPosition = 0;
+            childViewCount = adapter.getCount();
             if (mPagerObserver == null) {
                 mPagerObserver = new PagerObserver() {
                     @Override
                     public void onDataSetChanged() {
-                        position -= mPageViews.size();
+                        childViewCount = adapter.getCount();
+                        mPosition -= mPagerViews.size();
+                        checkPosition(mPosition);
                         nextPage();
                     }
                 };
@@ -80,45 +87,30 @@ public class PagerFlowLayout extends FlowLayout {
     }
 
     public void nextPage() {
-
         nextPageWithoutLayout();
-
         requestLayout();
         invalidate();
     }
 
-    private boolean isNeedNextPage(){
-        if (needNextPage) {
-            if (hasMeasureStart) {
-                needNextPage = false;
-                return true;
-            } else {
-                return false;
-            }
-        } else {
-            return false;
-        }
-    }
-
-    private boolean checkNextPageable() {
+    private void nextPageWithoutLayout() {
         if (!hasMeasureStart) {
             needNextPage = true;
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-    private void nextPageWithoutLayout() {
-
-        if (!checkNextPageable()) {
             return;
         }
 
         removeAllViewsInLayout();
-        mPageViews.clear();
+        if (mAdapter != null && mPagerViews.size() > 0 && mAdapter.getViewTypeCount() > 0) {
+            int position = mPosition - 1;
+            for (View view : mPagerViews) {
+                int maxLength = (int) Math.ceil(1.0f * mPagerViews.size() / mAdapter.getViewTypeCount());
+                viewCache.cache(mAdapter.getItemViewType(checkPosition(position)), view, maxLength);
+                position--;
+            }
+        }
+        mPagerViews.clear();
 
-        if (itemCount <= 0) {
+        if (childViewCount <= 0 || mAdapter == null) {
+            mPosition = 0;
             return;
         }
 
@@ -126,37 +118,46 @@ public class PagerFlowLayout extends FlowLayout {
         FlowLayoutHelper.MeasureResult result = new FlowLayoutHelper.MeasureResult();
         layoutHelper.preMeasure(this, mWidthMeasureSpec, mHeightMeasureSpec, maxLine, result);
 
-        View child = nextChild();
+        View child = getChild(checkPosition());
         while (layoutHelper.measure(child)) {
-            mPageViews.add(child);
-            child = nextChild();
+            mPagerViews.add(child);
+            mPosition++;
+            child = getChild(checkPosition());
         }
 
         layoutHelper.endMeasure();
 
         if (result.invalidChildNum > 0) {
-            position -= result.invalidChildNum;
+            mPosition -= result.invalidChildNum;
         }
 
-        for (View view : mPageViews) {
+        for (View view : mPagerViews) {
             addViewInLayout(view, -1, view.getLayoutParams());
         }
     }
 
-    private View nextChild() {
+    private int checkPosition() {
+        mPosition = checkPosition(mPosition);
+        return mPosition;
+    }
 
-        if (position >= itemCount) {
-            position = position % itemCount;
+    private int checkPosition(int pos) {
+        if (childViewCount <= 0) {
+            return 0; // 不正常的情况处理，调用此方法时应该保证:childViewCount>0
         }
 
-        while (position < 0) {
-            position += itemCount;
+        if (pos >= childViewCount) {
+            pos = pos % childViewCount;
         }
 
-        final int positionCur = position;
-        position++;
+        while (pos < 0) {
+            pos += childViewCount;
+        }
+        return pos;
+    }
 
-        View view = mAdapter.getView(positionCur);
+    private View getChild(final int position) {
+        View view = mAdapter.getView(position, getConvertView(mAdapter.getItemViewType(position)));
         if (view.getLayoutParams() == null) {
             view.setLayoutParams(generateDefaultLayoutParams());
         }
@@ -164,11 +165,15 @@ public class PagerFlowLayout extends FlowLayout {
             @Override
             public void onClick(View v) {
                 if (onItemClickListener != null) {
-                    onItemClickListener.onItemClicked(positionCur);
+                    onItemClickListener.onItemClicked(position);
                 }
             }
         });
         return view;
+    }
+
+    private View getConvertView(int itemViewType) {
+        return viewCache.get(itemViewType);
     }
 
     public static abstract class Adapter {
@@ -192,7 +197,7 @@ public class PagerFlowLayout extends FlowLayout {
 
         public abstract int getCount();
 
-        public abstract View getView(int position);
+        public abstract View getView(int position, View convertView);
 
         public abstract int getItemViewType(int position);
 
@@ -223,5 +228,37 @@ public class PagerFlowLayout extends FlowLayout {
 
     public interface OnItemClickListener {
         void onItemClicked(int posittion);
+    }
+
+    public static class ViewCache {
+        SparseArray<LinkedList<View>> viewArray = new SparseArray<>();
+
+        public void cache(int type, View view, int maxLength) {
+            if (view == null) {
+                return;
+            }
+            LinkedList<View> viewList = viewArray.get(type);
+            if (viewList == null) {
+                viewList = new LinkedList<>();
+                viewArray.put(type, viewList);
+            }
+            if (viewList.size() < maxLength) {
+                viewList.add(view);
+            }
+        }
+
+        public View get(int type) {
+            View view = null;
+            LinkedList<View> viewList = viewArray.get(type);
+            if (viewList != null) {
+                view = viewList.peek();
+                viewList.poll();
+            }
+            return view;
+        }
+
+        public void clear() {
+            viewArray.clear();
+        }
     }
 }

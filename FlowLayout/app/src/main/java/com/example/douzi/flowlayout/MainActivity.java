@@ -1,8 +1,8 @@
 package com.example.douzi.flowlayout;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
 
@@ -51,6 +51,27 @@ public class MainActivity extends Activity {
                 pagerFlowLayout.setAdapter(adapter);
             }
         });
+        this.findViewById(R.id.data_change_one).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                data = sourceOne;
+                adapter.notifyDataSetChanged();
+            }
+        });
+        this.findViewById(R.id.data_change_two).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                data = sourceTwo;
+                adapter.notifyDataSetChanged();
+            }
+        });
+        this.findViewById(R.id.data_change_three).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                data = sourceThree;
+                adapter.notifyDataSetChanged();
+            }
+        });
 
         View btnNextPage = this.findViewById(R.id.tv_next_page);
         btnNextPage.setOnClickListener(new View.OnClickListener() {
@@ -70,21 +91,39 @@ public class MainActivity extends Activity {
             }
 
             @Override
-            public View getView(int position) {
-                TextView view = new TextView(MainActivity.this);
+            public View getView(int position, View convertView) {
+                TextView view = (TextView) convertView;
+                if (view == null) {
+                    view = new TextView(MainActivity.this);
+                }
                 view.setSingleLine();
                 view.setText(data.get(position));
+                switch (getItemViewType(position)) {
+                    case 0:
+                        view.setBackgroundColor(Color.parseColor("#009900"));
+                        break;
+                    case 1:
+                        view.setBackgroundColor(Color.parseColor("#000099"));
+                        break;
+                    case 2:
+                        view.setBackgroundColor(Color.parseColor("#006600"));
+                        break;
+                    case 3:
+                        view.setBackgroundColor(Color.parseColor("#000066"));
+                        break;
+                }
                 return view;
             }
 
             @Override
             public int getItemViewType(int position) {
-                return 1;
+                int type = position % 4;
+                return type;
             }
 
             @Override
             public int getViewTypeCount() {
-                return 1;
+                return 4;
             }
         };
         data = sourceOne;
@@ -95,15 +134,15 @@ public class MainActivity extends Activity {
     private void initData() {
         sourceOne = new ArrayList<>();
         for (int i = 0; i < 25; i++) {
-            sourceOne.add(" " + i + "one-测试以下呀哈");
+            sourceOne.add("1-" + i + "-测试以下呀哈");
         }
         sourceTwo = new ArrayList<>();
         for (int i = 0; i < 20; i++) {
-            sourceTwo.add(" " + i + "two-测试以下呀哈");
+            sourceTwo.add("2-" + i + "-测试以下呀哈");
         }
         sourceThree = new ArrayList<>();
         for (int i = 0; i < 18; i++) {
-            sourceThree.add(" " + i + "three-测试以下呀哈");
+            sourceThree.add("3-" + i + "-测试以下呀哈");
         }
     }
 }
