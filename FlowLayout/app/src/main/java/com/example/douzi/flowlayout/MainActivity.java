@@ -3,7 +3,9 @@ package com.example.douzi.flowlayout;
 import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -97,7 +99,11 @@ public class MainActivity extends Activity {
                     view = new TextView(MainActivity.this);
                 }
                 view.setSingleLine();
+                view.setEllipsize(TextUtils.TruncateAt.END);
                 view.setText(data.get(position));
+                FlowLayout.LayoutParams params = pagerFlowLayout.generateDefaultLayoutParams();
+                params.setMargins(40, 40, 40, 40);
+                view.setLayoutParams(params);
                 switch (getItemViewType(position)) {
                     case 0:
                         view.setBackgroundColor(Color.parseColor("#009900"));

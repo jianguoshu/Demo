@@ -17,7 +17,7 @@ public class PagerFlowLayout extends FlowLayout {
 
     private int mWidthMeasureSpec;
     private int mHeightMeasureSpec;
-    private List<View> mPagerViews = new ArrayList<>();
+    private List<ViewWrapper> mPagerViews = new ArrayList<>();
     private ViewCache viewCache = new ViewCache();
     private int mPosition = 0; // 保存child的下一个position，比当前position大1
     private int childViewCount = 0;
@@ -102,11 +102,9 @@ public class PagerFlowLayout extends FlowLayout {
 
         removeAllViewsInLayout();
         if (mAdapter != null && mPagerViews.size() > 0 && mAdapter.getViewTypeCount() > 0) {
-            int position = mPosition - 1;
-            for (View view : mPagerViews) {
+            for (ViewWrapper viewWrapper : mPagerViews) {
                 int maxLength = (int) Math.ceil(1.0f * mPagerViews.size() / mAdapter.getViewTypeCount());
-                viewCache.cache(mAdapter.getItemViewType(checkPosition(position)), view, maxLength);
-                position--;
+                viewCache.cache(viewWrapper.type, viewWrapper.view, maxLength);
             }
         }
         mPagerViews.clear();
@@ -120,8 +118,8 @@ public class PagerFlowLayout extends FlowLayout {
         FlowLayoutHelper.MeasureResult result = new FlowLayoutHelper.MeasureResult();
         layoutHelper.preMeasure(this, mWidthMeasureSpec, mHeightMeasureSpec, maxLine, result);
 
-        View child = getChild(checkPosition());
-        while (layoutHelper.measure(child)) {
+        ViewWrapper child = getChild(checkPosition());
+        while (layoutHelper.measure(child.view)) {
             mPagerViews.add(child);
             mPosition++;
             child = getChild(checkPosition());
@@ -133,7 +131,9 @@ public class PagerFlowLayout extends FlowLayout {
             mPosition -= result.invalidChildNum;
         }
 
-        for (View view : mPagerViews) {
+        View view;
+        for (ViewWrapper viewWrapper : mPagerViews) {
+            view = viewWrapper.view;
             addViewInLayout(view, -1, view.getLayoutParams());
         }
     }
@@ -158,8 +158,9 @@ public class PagerFlowLayout extends FlowLayout {
         return pos;
     }
 
-    private View getChild(final int position) {
-        View view = mAdapter.getView(position, getConvertView(mAdapter.getItemViewType(position)));
+    private ViewWrapper getChild(final int position) {
+        int type = mAdapter.getItemViewType(position);
+        View view = mAdapter.getView(position, getConvertView(type));
         if (view.getLayoutParams() == null) {
             view.setLayoutParams(generateDefaultLayoutParams());
         }
@@ -171,7 +172,7 @@ public class PagerFlowLayout extends FlowLayout {
                 }
             }
         });
-        return view;
+        return new ViewWrapper(type, view);
     }
 
     private View getConvertView(int itemViewType) {
@@ -261,6 +262,16 @@ public class PagerFlowLayout extends FlowLayout {
 
         public void clear() {
             viewArray.clear();
+        }
+    }
+
+    public static class ViewWrapper {
+        int type;
+        View view;
+
+        public ViewWrapper(int type, View view) {
+            this.type = type;
+            this.view = view;
         }
     }
 }
