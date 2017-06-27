@@ -69,6 +69,8 @@ public class PagerFlowLayout extends FlowLayout {
             removeAllViews();
         } else {
             mPosition = 0;
+            mPagerViews.clear();
+            viewCache.clear();
             childViewCount = adapter.getCount();
             if (mPagerObserver == null) {
                 mPagerObserver = new PagerObserver() {
