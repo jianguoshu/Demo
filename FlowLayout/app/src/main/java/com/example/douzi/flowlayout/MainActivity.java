@@ -1,40 +1,79 @@
 package com.example.douzi.flowlayout;
 
 import android.app.Activity;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends Activity {
 
+    private PagerFlowLayout.Adapter adapter;
+    private List<String> sourceOne;
+    private List<String> sourceTwo;
+    private List<String> sourceThree;
+    private PagerFlowLayout pagerFlowLayout;
+    List<String> data = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final List<String> source = new ArrayList<>();
-        for (int i = 0; i < 25; i++) {
-            source.add(" " + i + "测试以下呀哈");
-        }
+        initData();
 
-        final PagerFlowLayout pagerFlowLayout = (PagerFlowLayout) this.findViewById(R.id.pager);
-        pagerFlowLayout.setAdapter(new PagerFlowLayout.Adapter() {
+        initViews();
+    }
+
+    private void initViews() {
+        initFlowLayout();
+        this.findViewById(R.id.adapter_one).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                data = sourceOne;
+                pagerFlowLayout.setAdapter(adapter);
+            }
+        });
+        this.findViewById(R.id.adapter_two).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                data = sourceTwo;
+                pagerFlowLayout.setAdapter(adapter);
+            }
+        });
+        this.findViewById(R.id.adapter_three).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                data = sourceThree;
+                pagerFlowLayout.setAdapter(adapter);
+            }
+        });
+
+        View btnNextPage = this.findViewById(R.id.tv_next_page);
+        btnNextPage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pagerFlowLayout.nextPage();
+            }
+        });
+    }
+
+    private void initFlowLayout() {
+        pagerFlowLayout = (PagerFlowLayout) this.findViewById(R.id.pager);
+        adapter = new PagerFlowLayout.Adapter() {
             @Override
             public int getCount() {
-                return source.size();
+                return data.size();
             }
 
             @Override
             public View getView(int position) {
                 TextView view = new TextView(MainActivity.this);
-                view.setText(source.get(position));
+                view.setSingleLine();
+                view.setText(data.get(position));
                 return view;
             }
 
@@ -47,33 +86,24 @@ public class MainActivity extends Activity {
             public int getViewTypeCount() {
                 return 1;
             }
-        });
-//        pagerFlowLayout.nextPage();
-        View btnNextPage = this.findViewById(R.id.tv_next_page);
-        btnNextPage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                pagerFlowLayout.nextPage();
-            }
-        });
-//
-//        View autoNextPage = this.findViewById(R.id.auto_next_page);
-//        autoNextPage.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//            }
-//        });
+        };
+        data = sourceOne;
+        pagerFlowLayout.setAdapter(adapter);
+        pagerFlowLayout.nextPage();
     }
 
-    private List<View> initViews() {
-        List<View> views = new ArrayList<>();
-        for (int i = 0; i < 50; i++) {
-            TextView view = new TextView(this);
-            view.setText(" " + i + " 测试仪下呀");
-            view.setMaxLines(1);
-            view.setEllipsize(TextUtils.TruncateAt.END);
-            views.add(view);
+    private void initData() {
+        sourceOne = new ArrayList<>();
+        for (int i = 0; i < 25; i++) {
+            sourceOne.add(" " + i + "one-测试以下呀哈");
         }
-        return views;
+        sourceTwo = new ArrayList<>();
+        for (int i = 0; i < 20; i++) {
+            sourceTwo.add(" " + i + "two-测试以下呀哈");
+        }
+        sourceThree = new ArrayList<>();
+        for (int i = 0; i < 18; i++) {
+            sourceThree.add(" " + i + "three-测试以下呀哈");
+        }
     }
 }

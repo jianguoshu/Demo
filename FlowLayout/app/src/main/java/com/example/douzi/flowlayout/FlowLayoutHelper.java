@@ -44,7 +44,6 @@ public class FlowLayoutHelper {
 
     public MeasureResult endMeasure() {
 
-        Log.i(FlowLayoutHelper.class.getSimpleName(), "measure-result : " + mMeasureResult.toString());
 
         if (isLintStart) {
             mMeasureResult.measuredWidth = maxWidthAllLine;
@@ -54,6 +53,7 @@ public class FlowLayoutHelper {
             mMeasureResult.measuredWidth = Math.max(maxWidthAllLine, line.width);
             mMeasureResult.measureHeight = heightUsed + line.height;
         }
+        Log.i(FlowLayoutHelper.class.getSimpleName(), "measure-result : " + mMeasureResult.toString());
         return mMeasureResult;
     }
 

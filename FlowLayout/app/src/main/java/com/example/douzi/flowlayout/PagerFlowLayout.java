@@ -1,11 +1,8 @@
 package com.example.douzi.flowlayout;
 
 import android.content.Context;
-import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +22,8 @@ public class PagerFlowLayout extends FlowLayout {
     private PagerObserver mPagerObserver;
 
     private OnItemClickListener onItemClickListener;
+    private boolean needNextPage;
+    private boolean hasMeasureStart;
 
     public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
         this.onItemClickListener = onItemClickListener;
@@ -44,9 +43,13 @@ public class PagerFlowLayout extends FlowLayout {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        hasMeasureStart = true;
         mWidthMeasureSpec = widthMeasureSpec;
         mHeightMeasureSpec = heightMeasureSpec;
+        if (isNeedNextPage()) {
+            nextPageWithoutLayout();
+        }
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 
     public void setAdapter(Adapter adapter) {
@@ -71,10 +74,47 @@ public class PagerFlowLayout extends FlowLayout {
                     }
                 };
             }
+            mAdapter.registerDataSetObserver(mPagerObserver);
+            nextPage();
         }
     }
 
     public void nextPage() {
+
+        nextPageWithoutLayout();
+
+        requestLayout();
+        invalidate();
+    }
+
+    private boolean isNeedNextPage(){
+        if (needNextPage) {
+            if (hasMeasureStart) {
+                needNextPage = false;
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    private boolean checkNextPageable() {
+        if (!hasMeasureStart) {
+            needNextPage = true;
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    private void nextPageWithoutLayout() {
+
+        if (!checkNextPageable()) {
+            return;
+        }
+
         removeAllViewsInLayout();
         mPageViews.clear();
 
@@ -101,9 +141,6 @@ public class PagerFlowLayout extends FlowLayout {
         for (View view : mPageViews) {
             addViewInLayout(view, -1, view.getLayoutParams());
         }
-
-        requestLayout();
-        invalidate();
     }
 
     private View nextChild() {
@@ -112,7 +149,7 @@ public class PagerFlowLayout extends FlowLayout {
             position = position % itemCount;
         }
 
-        while(position < 0){
+        while (position < 0) {
             position += itemCount;
         }
 
